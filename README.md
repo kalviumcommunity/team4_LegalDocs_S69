@@ -16,11 +16,18 @@ A property insurance provider holds policy documents, claim guidelines, and unde
 - Claude API
 - React
 
-## Current Progress
+## Backend Structure
 
-### Sprint 2 — Day 1
-- Repository created
-- Backend structure created
-- FastAPI configured
-- Required dependencies installed
-- Health check endpoint implemented
+- `app.py` — FastAPI application
+- `data/` — Insurance documents
+- `parser/` — PDF parsing and chunking
+- `embeddings/` — Document embeddings
+- `retrieval/` — Semantic retrieval
+
+## Sprint 2 — Day 1
+
+- Initialized backend structure
+- Configured FastAPI
+- Added health check endpoint
+- Added RAG-related dependencies
+- Created directories for future document processing
