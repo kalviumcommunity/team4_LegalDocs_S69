@@ -1,0 +1,33 @@
+:root {
+  --ink: #1b2430;
+  --ink-soft: #4c5766;
+  --paper: #f6f4ef;
+  --panel: #ffffff;
+  --line: #dcd7cc;
+  --accent: #8a5a2b;
+  --accent-soft: #f1e4d3;
+  --conflict: #a13d2f;
+  --conflict-soft: #fbe9e6;
+  --font-display: 'Source Serif 4', Georgia, serif;
+  --font-ui: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+}
