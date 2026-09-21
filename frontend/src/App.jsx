@@ -1,5 +1,5 @@
-import ChatScreen from './ChatScreen.jsx'
+import Chat from './components/Chat.jsx'
 
 export default function App() {
-  return <ChatScreen />
+  return <Chat />
 }
