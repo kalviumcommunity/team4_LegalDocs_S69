@@ -21,9 +21,7 @@ def chunk_by_sections(pages, document_name, version="unknown"):
     chunks = []
 
     for page in pages:
-        text = page["text"]
-
-        sections = text.split("\n\n")
+        sections = page["text"].split("\n\n")
 
         for section in sections:
             section = section.strip()
@@ -48,10 +46,8 @@ def process_pdf(file_path, version="unknown"):
 
     pages = extract_pdf(file_path)
 
-    chunks = chunk_by_sections(
+    return chunk_by_sections(
         pages,
         document_name=file_path.name,
         version=version
     )
-
-    return chunks
