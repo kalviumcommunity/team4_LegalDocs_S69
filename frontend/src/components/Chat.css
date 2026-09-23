@@ -105,6 +105,17 @@
   color: var(--ink-soft);
 }
 
+.message--error {
+  border-color: var(--conflict);
+  background: var(--conflict-soft);
+}
+
+.message__error {
+  margin: 0;
+  font-size: 14px;
+  color: var(--conflict);
+}
+
 .sources {
   margin-top: 12px;
   padding-top: 10px;

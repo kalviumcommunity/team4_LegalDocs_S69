@@ -1,41 +1,40 @@
 import { useState } from 'react'
 import Message from './Message.jsx'
 import { testQuestions } from '../data/questions.js'
+import { askQuestion } from '../services/api.js'
 import './Chat.css'
-
-// Static fake answer — stands in for the real retrieval + LLM response
-// until Angel's query endpoint is ready. Every question gets this same
-// canned reply for now, which is enough to test the UI states.
-function getFakeAnswer() {
-  return {
-    text: 'Based on the available documents, water damage caused by a sudden and accidental discharge is covered under the standard policy, subject to the stated deductible. Gradual seepage is excluded.',
-    sources: ['Property Policy — Section 4', 'Claims Guide — Page 12'],
-  }
-}
 
 export default function Chat() {
   const [input, setInput] = useState('')
-  const [messages, setMessages] = useState([]) // { id, role, text, sources, loading }
+  const [messages, setMessages] = useState([]) // { id, role, text, sources, loading, error }
 
-  function handleSend() {
+  async function handleSend() {
     const question = input.trim()
     if (!question) return
 
     const userMessage = { id: crypto.randomUUID(), role: 'user', text: question }
-    const loadingMessage = { id: crypto.randomUUID(), role: 'assistant', loading: true }
+    const pendingId = crypto.randomUUID()
+    const pendingMessage = { id: pendingId, role: 'assistant', loading: true }
 
-    setMessages((prev) => [...prev, userMessage, loadingMessage])
+    setMessages((prev) => [...prev, userMessage, pendingMessage])
     setInput('')
 
-    // Placeholder timing only — no backend call yet.
-    setTimeout(() => {
-      const { text, sources } = getFakeAnswer()
+    try {
+      const { answer, sources } = await askQuestion(question)
       setMessages((prev) =>
         prev.map((m) =>
-          m.id === loadingMessage.id ? { ...m, loading: false, text, sources } : m
+          m.id === pendingId ? { ...m, loading: false, text: answer, sources } : m
         )
       )
-    }, 700)
+    } catch (err) {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === pendingId
+            ? { ...m, loading: false, error: err.message || 'Something went wrong.' }
+            : m
+        )
+      )
+    }
   }
 
   function handleKeyDown(e) {
@@ -68,7 +67,14 @@ export default function Chat() {
           </div>
         ) : (
           messages.map((m) => (
-            <Message key={m.id} role={m.role} text={m.text} sources={m.sources} loading={m.loading} />
+            <Message
+              key={m.id}
+              role={m.role}
+              text={m.text}
+              sources={m.sources}
+              loading={m.loading}
+              error={m.error}
+            />
           ))
         )}
       </div>

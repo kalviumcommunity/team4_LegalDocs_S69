@@ -2,23 +2,24 @@ import Sources from './Sources.jsx'
 
 // Renders one message in the thread.
 // role: 'user' | 'assistant'
-// loading: true while a fake/real answer is being generated
-// sources: array of citation strings, only relevant for assistant messages
+// loading: true while waiting on the backend
+// error: error message string if the request failed
+// sources: array of { document, page, version }, assistant messages only
 
-export default function Message({ role, text, sources, loading }) {
+export default function Message({ role, text, sources, loading, error }) {
   const isUser = role === 'user'
 
   return (
-    <div className={`message message--${role}`}>
+    <div className={`message message--${role}${error ? ' message--error' : ''}`}>
       <p className="message__author">{isUser ? 'User' : 'ClauseIQ'}</p>
 
-      {loading ? (
-        <p className="message__loading">Looking through the documents…</p>
-      ) : (
-        <p className="message__text">{text}</p>
-      )}
+      {loading && <p className="message__loading">Looking through the documents…</p>}
 
-      {!isUser && !loading && <Sources sources={sources} />}
+      {error && !loading && <p className="message__error">{error}</p>}
+
+      {!loading && !error && <p className="message__text">{text}</p>}
+
+      {!isUser && !loading && !error && <Sources sources={sources} />}
     </div>
   )
 }

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
 // Expandable "Sources" block shown under an assistant answer.
-// Takes fake/static source strings for now — Angel's retrieval
-// pipeline will eventually supply real { document, section, page } objects.
+// Each source is an object from the backend:
+// { document: "Property Policy", page: 12, version: "2026" }
 
 export default function Sources({ sources }) {
   const [isOpen, setIsOpen] = useState(true)
@@ -23,7 +23,9 @@ export default function Sources({ sources }) {
         <ul className="sources__list">
           {sources.map((source, i) => (
             <li key={i} className="sources__item">
-              ▸ {source}
+              ▸ {source.document}
+              {source.page != null && ` — Page ${source.page}`}
+              {source.version && ` — ${source.version}`}
             </li>
           ))}
         </ul>
