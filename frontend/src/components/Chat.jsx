@@ -1,40 +1,65 @@
 import { useState } from 'react'
 import Message from './Message.jsx'
-import { testQuestions } from '../data/questions.js'
-import { askQuestion } from '../services/api.js'
+import Sidebar from './Sidebar.jsx'
+import { sampleConversations } from '../data/sampleConversations.js'
 import './Chat.css'
+
+// Today's build: dummy data only, no backend call yet.
+// Once Angel's /ask endpoint is live, swap resolveAnswer() below
+// for a real call to services/api.js (askQuestion).
+
+function resolveAnswer(question) {
+  const match = sampleConversations.find(
+    (c) => c.question.trim().toLowerCase() === question.trim().toLowerCase()
+  )
+  if (match) return { answer: match.answer, sources: match.sources }
+
+  // Generic fallback so any typed question still demos a full answer.
+  return {
+    answer: `Based on the available documents, here is a placeholder answer for: "${question}". This will be replaced by the real backend response.`,
+    sources: [{ document: 'Property Policy', section: 'General', page: 1, version: '2026' }],
+  }
+}
 
 export default function Chat() {
   const [input, setInput] = useState('')
-  const [messages, setMessages] = useState([]) // { id, role, text, sources, loading, error }
+  const [history, setHistory] = useState(sampleConversations) // preloaded demo questions
+  const [current, setCurrent] = useState(null) // { id, question, answer, sources, loading, error }
 
-  async function handleSend() {
+  function runQuestion(question, forceError = false) {
+    const id = crypto.randomUUID()
+    setCurrent({ id, question, loading: true })
+
+    setTimeout(() => {
+      if (forceError) {
+        setCurrent({ id, question, loading: false, error: 'Unable to retrieve an answer. Please try again.' })
+        return
+      }
+
+      const { answer, sources } = resolveAnswer(question)
+      const entry = { id, question, answer, sources }
+      setCurrent({ ...entry, loading: false })
+
+      setHistory((prev) => {
+        const alreadyThere = prev.some(
+          (h) => h.question.trim().toLowerCase() === question.trim().toLowerCase()
+        )
+        return alreadyThere ? prev : [...prev, entry]
+      })
+    }, 700)
+  }
+
+  function handleSend() {
     const question = input.trim()
     if (!question) return
-
-    const userMessage = { id: crypto.randomUUID(), role: 'user', text: question }
-    const pendingId = crypto.randomUUID()
-    const pendingMessage = { id: pendingId, role: 'assistant', loading: true }
-
-    setMessages((prev) => [...prev, userMessage, pendingMessage])
+    runQuestion(question)
     setInput('')
+  }
 
-    try {
-      const { answer, sources } = await askQuestion(question)
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === pendingId ? { ...m, loading: false, text: answer, sources } : m
-        )
-      )
-    } catch (err) {
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === pendingId
-            ? { ...m, loading: false, error: err.message || 'Something went wrong.' }
-            : m
-        )
-      )
-    }
+  function handleSimulateError() {
+    const question = input.trim() || 'Simulated failing question'
+    runQuestion(question, true)
+    setInput('')
   }
 
   function handleKeyDown(e) {
@@ -44,52 +69,56 @@ export default function Chat() {
     }
   }
 
+  function handleSelectHistory(id) {
+    const item = history.find((h) => h.id === id)
+    if (item) setCurrent({ ...item, loading: false, error: undefined })
+  }
+
   return (
-    <div className="chat">
-      <header className="chat__header">
-        <h1 className="chat__title">ClauseIQ</h1>
-        <p className="chat__subtitle">Property Insurance Assistant</p>
-      </header>
+    <div className="layout">
+      <Sidebar history={history} onSelect={handleSelectHistory} activeId={current?.id} />
 
-      <div className="chat__thread">
-        {messages.length === 0 ? (
-          <div className="chat__empty">
-            <p>Ask a coverage question to get started.</p>
-            <ul className="chat__samples">
-              {testQuestions.slice(0, 3).map((q) => (
-                <li key={q.id}>
-                  <button className="chat__sample-btn" onClick={() => setInput(q.question)}>
-                    {q.question}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          messages.map((m) => (
-            <Message
-              key={m.id}
-              role={m.role}
-              text={m.text}
-              sources={m.sources}
-              loading={m.loading}
-              error={m.error}
-            />
-          ))
-        )}
-      </div>
+      <div className="chat">
+        <header className="chat__header">
+          <h1 className="chat__title">ClauseIQ</h1>
+          <p className="chat__subtitle">Property Insurance Assistant</p>
+        </header>
 
-      <div className="chat__input-bar">
-        <input
-          className="chat__input"
-          type="text"
-          placeholder="Ask about your policy..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        <button className="chat__send" onClick={handleSend} disabled={!input.trim()}>
-          Send
+        <div className="chat__thread">
+          {!current ? (
+            <div className="chat__empty">
+              <p>Ask a coverage question to get started.</p>
+              <p className="chat__empty-hint">Or pick a previous question from the sidebar.</p>
+            </div>
+          ) : (
+            <>
+              <Message role="user" text={current.question} />
+              <Message
+                role="assistant"
+                text={current.answer}
+                sources={current.sources}
+                loading={current.loading}
+                error={current.error}
+              />
+            </>
+          )}
+        </div>
+
+        <div className="chat__input-bar">
+          <input
+            className="chat__input"
+            type="text"
+            placeholder="Ask about your policy..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <button className="chat__send" onClick={handleSend} disabled={!input.trim()}>
+            Send
+          </button>
+        </div>
+        <button className="chat__simulate-error" onClick={handleSimulateError}>
+          Simulate error (for testing)
         </button>
       </div>
     </div>
