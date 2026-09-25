@@ -1,6 +1,6 @@
 // Hardcoded conversations for building/testing the UI without the backend.
-// Once Angel's /ask endpoint is live, this file stops being used for
-// answers — it can still power the "sample question" suggestions.
+// `hasConflict: true` drives the ConflictWarning banner — it's a UI-only
+// flag for now, until Angel's backend can detect disagreeing chunks.
 
 export const sampleConversations = [
   {
@@ -8,7 +8,7 @@ export const sampleConversations = [
     question: 'Is water damage covered?',
     answer: 'Water damage is covered subject to the conditions specified in the policy.',
     sources: [
-      { document: 'Property Policy', section: 'Water Damage', page: 12, version: '2026' },
+      { document: 'Property Policy', section: 'Water Damage', page: 37, version: '2026' },
       { document: 'Claims Guidelines', section: 'Coverage Limits', page: 8, version: '2025' },
     ],
   },
@@ -23,10 +23,11 @@ export const sampleConversations = [
   {
     id: 'c3',
     question: 'What are the fire exclusions?',
-    answer: 'Fire damage resulting from intentional acts, war, or nuclear hazard is excluded. Damage from an insured fire peril to the dwelling itself remains covered.',
+    answer: 'The policy wording and the claims guideline disagree on this: the policy states jewelry and valuables are capped at a fixed sub-limit, while the claims guideline references a different, higher figure for the same category.',
     sources: [
-      { document: 'Property Policy', section: 'Exclusions', page: 19, version: '2026' },
+      { document: 'Property Policy', section: 'Fire Exclusions', page: 19, version: '2026' },
       { document: 'Claims Guidelines', section: 'Fire Claims', page: 14, version: '2025' },
     ],
+    hasConflict: true,
   },
 ]

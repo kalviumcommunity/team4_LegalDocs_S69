@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Message from './Message.jsx'
 import Sidebar from './Sidebar.jsx'
+import ConflictWarning from './ConflictWarning.jsx'
 import { sampleConversations } from '../data/sampleConversations.js'
 import './Chat.css'
 
@@ -12,7 +13,7 @@ function resolveAnswer(question) {
   const match = sampleConversations.find(
     (c) => c.question.trim().toLowerCase() === question.trim().toLowerCase()
   )
-  if (match) return { answer: match.answer, sources: match.sources }
+  if (match) return { answer: match.answer, sources: match.sources, hasConflict: !!match.hasConflict }
 
   // Generic fallback so any typed question still demos a full answer.
   return {
@@ -36,8 +37,8 @@ export default function Chat() {
         return
       }
 
-      const { answer, sources } = resolveAnswer(question)
-      const entry = { id, question, answer, sources }
+      const { answer, sources, hasConflict } = resolveAnswer(question)
+      const entry = { id, question, answer, sources, hasConflict }
       setCurrent({ ...entry, loading: false })
 
       setHistory((prev) => {
@@ -93,6 +94,7 @@ export default function Chat() {
           ) : (
             <>
               <Message role="user" text={current.question} />
+              {current.hasConflict && !current.loading && !current.error && <ConflictWarning />}
               <Message
                 role="assistant"
                 text={current.answer}

@@ -16,6 +16,7 @@ function SourceCard({ source }) {
         aria-expanded={isOpen}
       >
         <span className="source-card__arrow">{isOpen ? '▾' : '▸'}</span>
+        <span className="source-card__icon">📄</span>
         <span className="source-card__name">{source.document}</span>
       </button>
 
