@@ -156,6 +156,29 @@
   color: var(--conflict);
 }
 
+/* Conflict warning */
+.conflict-warning {
+  align-self: flex-start;
+  max-width: 85%;
+  background: var(--conflict-soft);
+  border: 1px solid var(--conflict);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.conflict-warning__title {
+  margin: 0 0 4px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--conflict);
+}
+
+.conflict-warning__text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink);
+}
+
 /* Sources */
 .sources {
   margin-top: 14px;
