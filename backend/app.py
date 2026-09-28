@@ -25,7 +25,8 @@ from schemas import QuestionRequest
 @app.post("/ask")
 def ask_question(request: QuestionRequest):
     return {
-        "question": request.question,
-        "answer": "RAG answer generation will be connected here.",
-        "sources": []
-    }
+    "status": "success",
+    "question": request.question,
+    "answer": "RAG answer generation will be connected here.",
+    "sources": []
+}
