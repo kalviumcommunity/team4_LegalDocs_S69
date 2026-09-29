@@ -30,3 +30,9 @@ def ask_question(request: QuestionRequest):
     "answer": "RAG answer generation will be connected here.",
     "sources": []
 }
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy",
+        "service": "ClauseIQ API"
+    }
