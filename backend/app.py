@@ -24,12 +24,20 @@ from schemas import QuestionRequest
 
 @app.post("/ask")
 def ask_question(request: QuestionRequest):
-    return {
-    "status": "success",
-    "question": request.question,
-    "answer": "RAG answer generation will be connected here.",
-    "sources": []
-}
+    try:
+        return {
+            "status": "success",
+            "question": request.question,
+            "answer": "RAG answer generation will be connected here.",
+            "sources": []
+        }
+    except Exception:
+        return {
+            "status": "error",
+            "question": request.question,
+            "answer": "Unable to process the question.",
+            "sources": []
+        }
 @app.get("/health")
 def health_check():
     return {
