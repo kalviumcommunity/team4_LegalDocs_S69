@@ -44,3 +44,9 @@ def health_check():
         "status": "healthy",
         "service": "ClauseIQ API"
     }
+@app.get("/")
+def root():
+    return {
+        "message": "ClauseIQ API is running",
+        "version": "1.0"
+    }
